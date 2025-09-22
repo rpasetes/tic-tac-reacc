@@ -13,14 +13,8 @@ import type { GameState } from './tictactoe'
 
 // (1543) TARGET: MAKE APP RESPONSIVE
 // (1604) WE HAVE A RESPONSIVE APP LFG
+// (1702) FRONTEND INDEX CHANGED, 
 function App() {
-  // (1508) you can just deconstruct gameState
-  // (1515) ahh they gave me this limitation for a reason, honor it
-  // const [board, setBoard] = useState(GameState.board)
-  // const [winner, setWinner] = useState(GameState.winner)
-  // const [currentPlayer, setCurrentPlayer] = useState(GameState.nowPlaying)
-  // (1516) ohhh this is to simulate data from the backend huh...
-  // (1556) set type to satisfy untyped error
   const [gameState, setGameState] = useState<GameState>(initGameState)
 
   return (
@@ -29,22 +23,25 @@ function App() {
       <table className='grid'>
         <tbody>
           <tr>
-            <td onClick={() => setGameState(makeMove(gameState,0,0))}>{gameState.board[0][0]}</td>
-            <td onClick={() => setGameState(makeMove(gameState,0,1))}>{gameState.board[0][1]}</td>
-            <td onClick={() => setGameState(makeMove(gameState,0,2))}>{gameState.board[0][2]}</td>
+            <td onClick={() => setGameState(makeMove(gameState,0,0))}>{gameState.board[0]}</td>
+            <td onClick={() => setGameState(makeMove(gameState,0,1))}>{gameState.board[1]}</td>
+            <td onClick={() => setGameState(makeMove(gameState,0,2))}>{gameState.board[2]}</td>
           </tr>
           <tr>
-            <td onClick={() => setGameState(makeMove(gameState,1,0))}>{gameState.board[1][0]}</td>
-            <td onClick={() => setGameState(makeMove(gameState,1,1))}>{gameState.board[1][1]}</td>
-            <td onClick={() => setGameState(makeMove(gameState,1,2))}>{gameState.board[1][2]}</td>
+            <td onClick={() => setGameState(makeMove(gameState,1,0))}>{gameState.board[3]}</td>
+            <td onClick={() => setGameState(makeMove(gameState,1,1))}>{gameState.board[4]}</td>
+            <td onClick={() => setGameState(makeMove(gameState,1,2))}>{gameState.board[5]}</td>
           </tr>
           <tr>
-            <td onClick={() => setGameState(makeMove(gameState,2,0))}>{gameState.board[2][0]}</td>
-            <td onClick={() => setGameState(makeMove(gameState,2,1))}>{gameState.board[2][1]}</td>
-            <td onClick={() => setGameState(makeMove(gameState,2,2))}>{gameState.board[2][2]}</td>
+            <td onClick={() => setGameState(makeMove(gameState,2,0))}>{gameState.board[6]}</td>
+            <td onClick={() => setGameState(makeMove(gameState,2,1))}>{gameState.board[7]}</td>
+            <td onClick={() => setGameState(makeMove(gameState,2,2))}>{gameState.board[8]}</td>
           </tr>
         </tbody>
       </table>
+      {gameState.winner 
+      ? <h1>{gameState.winner} WINS!</h1>
+      : <></>}
     </>
   )
 }
