@@ -1,11 +1,13 @@
+type Player = 'X' | 'O'
+
 export type GameState = {
-  nowPlaying: string,
+  nowPlaying: Player,
   winner: string | undefined
   board: string[],
 }
 
 export const initGameState = {
-  nowPlaying: 'X',
+  nowPlaying: 'X' as Player,
   winner: undefined,
   board: ['', '', '', '', '', '', '', '', '']
 }
@@ -24,7 +26,7 @@ export const makeMove = (gamestate: GameState, row: number, col: number): GameSt
 
   const winner = checkWinner(boardCopy)
   
-  const newGameState = {
+  const newGameState: GameState = {
     nowPlaying: newPlayer,
     winner: winner,
     board: boardCopy
