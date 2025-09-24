@@ -1,17 +1,23 @@
+type Player = 'X' | 'O'
+
 export type GameState = {
-  nowPlaying: string,
-  winner: string | undefined
+  nowPlaying: Player,
+  winner: string | null
   board: string[],
 }
 
-export const initGameState = {
-  nowPlaying: 'X',
-  winner: undefined,
+// (1057) nice, cleaned up my server logic,
+// by making it clear that initGameState is
+// of type GameState, now ts is happy :)
+export const initGameState: GameState = {
+  nowPlaying: 'X' as Player,
+  winner: null,
   board: ['', '', '', '', '', '', '', '', '']
 }
 
-// (1710) seems straightforward: start with win detect (done @ 1713)
-// then, cell occupy detect (DONE @ 1715)
+// (1111) okay we still want to serve this logic
+// to our currently running frontend, thank you
+// persistent undo stack for helping me recover
 export const makeMove = (gamestate: GameState, row: number, col: number): GameState => {
   if (gamestate.winner) { return gamestate }
   const boardCopy = gamestate.board
@@ -24,7 +30,7 @@ export const makeMove = (gamestate: GameState, row: number, col: number): GameSt
 
   const winner = checkWinner(boardCopy)
   
-  const newGameState = {
+  const newGameState: GameState = {
     nowPlaying: newPlayer,
     winner: winner,
     board: boardCopy
@@ -33,7 +39,7 @@ export const makeMove = (gamestate: GameState, row: number, col: number): GameSt
   return newGameState
 }
 
-export const checkWinner = (currentBoard: string[]): string | undefined => {
+export const checkWinner = (currentBoard: string[]): string | null => {
   const winStates = [
     [0, 1, 2], 
     [3, 4, 5], 
@@ -56,5 +62,5 @@ export const checkWinner = (currentBoard: string[]): string | undefined => {
     }
   }
 
-  return undefined
+  return null
 }
