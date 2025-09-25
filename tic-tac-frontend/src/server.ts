@@ -29,7 +29,13 @@ const makeMove = (row: number, col: number): void => {
 
 // (1017) we got an endpoint running.
 // app.get("/", (_, res) => res.send("Hafa from Express-Vite!"))
-app.get("/message", (_, res) => res.send("Hafa from Express-Vite!"))
+app.get("/message", (_, res) => res.send("Hello worlde!"))
+
+app.get("/data", (req, res) => {
+  console.log(req)
+  res.json({user: "data"})
+})
+
 
 // (1037) gosh add devdeps thru bun later, serve data first
 // (1044) eh nice, got to it, just an add + -d flag
