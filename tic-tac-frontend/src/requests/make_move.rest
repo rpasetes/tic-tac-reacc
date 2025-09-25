@@ -1,7 +1,7 @@
-POST http://localhost:3000/move
+POST http://localhost:3000/move/1574
 Content-Type: application/json
 
 {
   "row":0,
-  "col":0
+  "col":2
 }

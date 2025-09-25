@@ -1,24 +1,25 @@
 import express from "express"
 import ViteExpress from "vite-express"
-import { checkWinner, initGameState, type GameState } from "./tictactoe"
+import { checkWinner, createGameState, type GameState } from "./tictactoe"
 
 const app = express()
 app.use(express.json())
- 
-const gamestate = initGameState
 
 const gamestate_map: Map<string, GameState> = new Map<string, GameState>();
 
-const makeMove = (row: number, col: number): void => {
-  if (gamestate.winner) { return }
+const makeMove = (row: number, col: number, gamestate: GameState): GameState => {
+  if (gamestate.winner) { return gamestate }
   const boardCopy = gamestate.board
   const cell = 3 * row + col
 
-  if (boardCopy[cell] != '') { return }
+  if (boardCopy[cell] != '') { return gamestate }
   boardCopy[cell] = gamestate.nowPlaying
 
-  gamestate.nowPlaying = gamestate.nowPlaying === 'X' ? 'O' : 'X'
-  gamestate.winner = checkWinner(boardCopy)
+  return {
+    board: boardCopy,
+    nowPlaying: gamestate.nowPlaying === 'X' ? 'O' : 'X',
+    winner: checkWinner(boardCopy)
+  }
 }
 
 const generateId = (): string => {
@@ -32,8 +33,10 @@ app.get("/games", (_, res) => {
   res.json(Object.fromEntries(gamestate_map))
 })
 
+// (1504) oh lmao every created board refs initGameState
+// (1515) okay cool we got a gamestate blueprint
 app.post("/create", (_, res) => {
-  const gamestate = initGameState
+  const gamestate = createGameState()
   const id = generateId()
 
   gamestate_map.set(id, gamestate)
@@ -59,11 +62,23 @@ app.get("/game/:id", (req, res) => {
   res.json(game)
 })
 
-app.post("/move", (req, res) => {
+// (1449) GOAL: change makeMove to update idx'd board
+// (1453) wait, smell for mutations in makeMove
+// (1504) okay: why is every board the same?
+// (1517) and now we have multiple board states, SHIP
+app.post("/move/:id", (req, res) => {
+  const id = req.params.id
+
+  const gamestate = gamestate_map.get(id)
+  if (!gamestate) {
+    return res.status(404).json({ error: 'id not found' })
+  }
+
   const { row, col } = req.body
-  makeMove(row, col)
-  res.json(gamestate)
+  const newGamestate = makeMove(row, col, gamestate)
+  
+  gamestate_map.set(id, newGamestate)
+  res.json(newGamestate)
 })
 
-// (1119) nice, i can hot load my server!
 ViteExpress.listen(app, 3000, () => console.log("Server is listening..."))

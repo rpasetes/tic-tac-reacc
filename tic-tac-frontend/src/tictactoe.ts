@@ -6,18 +6,16 @@ export type GameState = {
   board: string[],
 }
 
-// (1057) nice, cleaned up my server logic,
-// by making it clear that initGameState is
-// of type GameState, now ts is happy :)
 export const initGameState: GameState = {
   nowPlaying: 'X' as Player,
   winner: null,
   board: ['', '', '', '', '', '', '', '', '']
 }
 
-// (1111) okay we still want to serve this logic
-// to our currently running frontend, thank you
-// persistent undo stack for helping me recover
+export function createGameState() {
+  return structuredClone(initGameState)
+}
+
 export const makeMove = (gamestate: GameState, row: number, col: number): GameState => {
   if (gamestate.winner) { return gamestate }
   const boardCopy = gamestate.board
