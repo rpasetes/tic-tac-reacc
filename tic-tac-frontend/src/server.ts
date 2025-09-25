@@ -1,16 +1,15 @@
 import express from "express"
 import ViteExpress from "vite-express"
-import { checkWinner, initGameState } from "./tictactoe"
+import { checkWinner, initGameState, type GameState } from "./tictactoe"
 
 const app = express()
 app.use(express.json())
-
-// (1048) we're handling this in memory, make it mutable
-// (1122) oh looks like we changed it back to const, haha
+ 
 const gamestate = initGameState
 
-// (1050) okay since it's in memory, we can be responsible
-// for mutability here, the client don't care
+// (1113) making new map separate from single game
+const gamestate_map: Map<string, GameState> = new Map<string, GameState>();
+
 const makeMove = (row: number, col: number): void => {
   if (gamestate.winner) { return }
   const boardCopy = gamestate.board
@@ -20,45 +19,49 @@ const makeMove = (row: number, col: number): void => {
   boardCopy[cell] = gamestate.nowPlaying
 
   gamestate.nowPlaying = gamestate.nowPlaying === 'X' ? 'O' : 'X'
-  // (1124) technically we'll always have a winner, so
-  // we no longer need this check, this'll also make sure
-  // our winner state keeps updating with every move
-  // if (winner) { gamestate.winner = winner }
   gamestate.winner = checkWinner(boardCopy)
 }
 
-// (1017) we got an endpoint running.
-// app.get("/", (_, res) => res.send("Hafa from Express-Vite!"))
-app.get("/message", (_, res) => res.send("Hafa from Express-Vite!"))
+// (1202) we have multiple games with a better id algo!
+const generateId = (): string => {
+  const id_number = Math.floor(Math.random() * 2048) 
+  console.log(id_number)
+  return id_number.toString()
+}
 
-// (1037) gosh add devdeps thru bun later, serve data first
-// (1044) eh nice, got to it, just an add + -d flag
-// (1112) oh wait i can just hit this endpoint to check if
-// my game state is updated in-memory
-// (1130) ohh haha how interesting, undefined doesn't show
-// up in a json field, BUT null does. good to know...
+// (1120) hit the endpoint, we have an empty map!
+// (1222) whoaaa you can convert Map to an object
+app.get("/games", (_, res) => {
+  console.log(gamestate_map)
+  res.json(Object.fromEntries(gamestate_map))
+})
+
+// (1140) okay, single game returned locally!
+// (1151) or at least to the console,
+// (1158) removed return statement, console log back!
+// (1207) new game get from gamestate_map!
+// (1215) logs are printing and json is returning!
+app.post("/create", (_, res) => {
+  const gamestate = initGameState
+  const id = generateId()
+
+  gamestate_map.set(id, gamestate)
+
+  console.log(gamestate_map)
+  console.log(gamestate_map.get(id))
+
+  res.json(gamestate_map.get(id))
+})
+
+app.get("/message", (_, res) => res.send("Hello Worl!"))
+
 app.get("/game", (_, res) => res.json(gamestate))
 
-// (1039) we'll need to get the json body here, let's port
-// our makeMove function then use the json middleware to
-// handle this change.
-// (1058) haha only three lines, nice, let's see if it works
-// (1103) ehh curl not giving me enough info, let's just run
-// in the browser and surface our initgamestate and changes
-// (1108) ohh okay now that we bundled this together, 
-// (1115) phew gotta remember how to format vscode reqs rq,
-// (1121) nice we got our data to update in memory hell yea
-// (1131) and now we made a null change to our data, we have
-// our response surfacing our winner field, heck yea COMMIT
 app.post("/move", (req, res) => {
   const { row, col } = req.body
   makeMove(row, col)
   res.json(gamestate)
 })
 
-// (1019) hmm so there's a wildcard set up here??
-// (1030) ahh it wasn't showing up cuz my root endpoint
-// was overwritten by what is now '/message' haha
-// thanks jahnik for uncomplecting me, crossing wires
-// not meant to be woven together...
-ViteExpress.listen(app, 3000, () => console.log("Server is listening...", gamestate))
+// (1119) nice, i can hot load my server!
+ViteExpress.listen(app, 3000, () => console.log("Server is listening..."))
