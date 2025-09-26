@@ -1,87 +1,96 @@
-import { makeMove, type GameState } from "./tictactoe"
-
-type GameType = {
-  gameState: GameState,
-  setGameState: React.Dispatch<React.SetStateAction<GameState>>
-}
+import { useEffect, useState } from "react"
+import { type GameState } from "./tictactoe"
 
 type CellProps = {
-  row: number
-  col: number
+  cellIndex: number
   gameState: GameState
+  makeMove: (cellIndex: number) => Promise<void>
 }
 
-// (2155) you know what screw it i'm gonna simplify
-// and break down components this time around.
-// (2232) with this broken down, we can call our
-// move/:id endpoint.
-// TODO: write mutation query hook here for makeMove
-// and how it connects to "server state" vs "client state" 
-function Cell({ row, col, gameState }: CellProps) {
+function Cell({ cellIndex, gameState, makeMove }: CellProps) {
 
   const handleClick = () => {
-    makeMove(gameState, row, col)
+    makeMove(cellIndex)
   }
 
   return (
     <td onClick={handleClick}>
-      {gameState.board[3 * row + col]}
+      {gameState.board[cellIndex]}
     </td>
   )
 }
 
-function Board({ gameState }: {gameState: GameState}) {
+type BoardProps = {
+  gameState: GameState,
+  makeMove: (cellIndex: number) => Promise<void>
+}
+
+function Board({ gameState, makeMove }: BoardProps) {
   return (
     <table className='grid'>
       <tbody>
         <tr>
-          <Cell row={0} col={0} gameState={gameState} />
-          <Cell row={0} col={1} gameState={gameState} />
-          <Cell row={0} col={2} gameState={gameState} />
+          <Cell cellIndex={0} gameState={gameState} makeMove={makeMove} />
+          <Cell cellIndex={1} gameState={gameState} makeMove={makeMove} />
+          <Cell cellIndex={2} gameState={gameState} makeMove={makeMove} />
         </tr>
         <tr>
-          <Cell row={1} col={0} gameState={gameState} />
-          <Cell row={1} col={1} gameState={gameState} />
-          <Cell row={1} col={2} gameState={gameState} />
+          <Cell cellIndex={3} gameState={gameState} makeMove={makeMove} />
+          <Cell cellIndex={4} gameState={gameState} makeMove={makeMove} />
+          <Cell cellIndex={5} gameState={gameState} makeMove={makeMove} />
         </tr>
         <tr>
-          <Cell row={2} col={0} gameState={gameState} />
-          <Cell row={2} col={1} gameState={gameState} />
-          <Cell row={2} col={2} gameState={gameState} />
+          <Cell cellIndex={6} gameState={gameState} makeMove={makeMove} />
+          <Cell cellIndex={7} gameState={gameState} makeMove={makeMove} />
+          <Cell cellIndex={8} gameState={gameState} makeMove={makeMove} />
         </tr>
       </tbody>
     </table>
   )
 }
 
-export function Game({ gameState, setGameState }: GameType) {
-  const board = gameState.board
-  const winner = gameState.winner
+type GameProps = {
+  gameId: string
+}
 
+// (1833) OMG... is that it?
+export function Game({ gameId }: GameProps) {
+  const [gameState, setGameState] = useState<GameState | undefined>(undefined)
+
+  // 1. loadGame
+  // --> setGameState, useEffect
+  // `/game/${gameId}`
+  useEffect(() => {
+    async function fetchGame() {
+      const response = await fetch(`/game/${gameId}`)
+      const game = await response.json()
+      setGameState(game)
+    }
+    fetchGame()
+  }, [gameId])
+
+  // 2. makeMove
+  // --> setGameState
+  // function makeMove(){
+  //   setGameState
+  // }
+  const makeMove = async (cellIndex: number) => {
+    const response = await fetch(`/move/${gameId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ cellIndex })
+    })
+    const game = await response.json()
+    setGameState(game)
+  }
+
+  if (!gameState) return <div>Loading...</div>
   return (
     <div>
-      <table className='grid'>
-        <tbody>
-          <tr>
-            <td onClick={() => setGameState(makeMove(gameState,0,0))}>{board[0]}</td>
-            <td onClick={() => setGameState(makeMove(gameState,0,1))}>{board[1]}</td>
-            <td onClick={() => setGameState(makeMove(gameState,0,2))}>{board[2]}</td>
-          </tr>
-          <tr>
-            <td onClick={() => setGameState(makeMove(gameState,1,0))}>{board[3]}</td>
-            <td onClick={() => setGameState(makeMove(gameState,1,1))}>{board[4]}</td>
-            <td onClick={() => setGameState(makeMove(gameState,1,2))}>{board[5]}</td>
-          </tr>
-          <tr>
-            <td onClick={() => setGameState(makeMove(gameState,2,0))}>{board[6]}</td>
-            <td onClick={() => setGameState(makeMove(gameState,2,1))}>{board[7]}</td>
-            <td onClick={() => setGameState(makeMove(gameState,2,2))}>{board[8]}</td>
-          </tr>
-        </tbody>
-      </table>
-      {winner 
-      ? <h1>{winner} WINS!</h1>
-      : <></>}
+      <Board makeMove={makeMove} gameState={gameState} />
+      {gameState.winner && <h1>{gameState.winner} WINS!</h1>}
     </div>
   )
 }

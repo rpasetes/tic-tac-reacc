@@ -1,25 +1,26 @@
-import { QueryClient, QueryClientProvider, useMutation, useQuery } from "@tanstack/react-query"
-import type { GameState } from "./tictactoe"
-
-type GameEntry = [id: string, game: GameState]
-
-const queryClient = new QueryClient()
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 const queryKey = ['games']
 
- function GameList() {
+type LobbyProps = {
+  setGameId: React.Dispatch<React.SetStateAction<string | undefined>>
+}
+
+export function Lobby({ setGameId }: LobbyProps) {
+  const { invalidateQueries } = useQueryClient()
+
   const createGame = useMutation({
     mutationFn: async () => {
       const response = await fetch('/create')
       return await response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey })
+      invalidateQueries({ queryKey })
     }
   })
 
-  const { data, error, isPending } = useQuery({
+  const { data: gameList, error, isPending } = useQuery({
     queryKey,
-    queryFn: async () => {
+    queryFn: async (): Promise<string[]> => {
       const response = await fetch('/games')
       return await response.json()
     }
@@ -27,17 +28,17 @@ const queryKey = ['games']
 
   if (error) return <div>{error.message}</div>
   if (isPending) return <div>Loading...</div>
-  if (data) {
-    const gameList = data as GameEntry[]
-
+  if (gameList) {
+    console.log(gameList)
     return (
       <div>
+        <h1>SERVER LOBBY</h1>
         <button onClick={() => createGame.mutate()}>
           Create New Game
         </button>
-        {gameList.map((game) => (
-          <div key={game[0]}>
-            <div>Game {game[0]} has {game[1].nowPlaying} playing</div>
+        {gameList && gameList.map((gameId) => (
+          <div key={gameId}>
+            <button onClick={() => setGameId(gameId)}>Join {gameId}</button>
           </div>
         ))}
       </div>
@@ -45,12 +46,4 @@ const queryKey = ['games']
   }
 
   return <></>
-}
-
-export function Lobby() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <GameList />
-    </QueryClientProvider>
-  )
 }
