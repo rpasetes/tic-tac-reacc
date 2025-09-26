@@ -28,15 +28,11 @@ const generateId = (): string => {
   return id_number.toString()
 }
 
-// (2129) shout out actually just destructuring
-// a map into an array of key val pairs
 app.get("/games", (_, res) => {
   console.log(gamestate_map)
   res.json([...gamestate_map])
 })
 
-// (1504) oh lmao every created board refs initGameState
-// (1515) okay cool we got a gamestate blueprint
 app.post("/create", (_, res) => {
   const gamestate = createGameState()
   const id = generateId()
@@ -51,9 +47,6 @@ app.post("/create", (_, res) => {
 
 app.get("/message", (_, res) => res.send("Hello Worl!"))
 
-// (1429) GOAL: get game endpoint to return idx'd json game
-// (1432) option: use req.params to get idx
-// (1446) extra: got invalid id check
 app.get("/game/:id", (req, res) => {
   const id = req.params.id
   
@@ -64,10 +57,6 @@ app.get("/game/:id", (req, res) => {
   res.json(game)
 })
 
-// (1449) GOAL: change makeMove to update idx'd board
-// (1453) wait, smell for mutations in makeMove
-// (1504) okay: why is every board the same?
-// (1517) and now we have multiple board states, SHIP
 app.post("/move/:id", (req, res) => {
   const id = req.params.id
 
