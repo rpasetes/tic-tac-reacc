@@ -5,6 +5,55 @@ type GameType = {
   setGameState: React.Dispatch<React.SetStateAction<GameState>>
 }
 
+type CellProps = {
+  row: number
+  col: number
+  gameState: GameState
+}
+
+// (2155) you know what screw it i'm gonna simplify
+// and break down components this time around.
+// (2232) with this broken down, we can call our
+// move/:id endpoint.
+// TODO: write mutation query hook here for makeMove
+// and how it connects to "server state" vs "client state" 
+function Cell({ row, col, gameState }: CellProps) {
+
+  const handleClick = () => {
+    makeMove(gameState, row, col)
+  }
+
+  return (
+    <td onClick={handleClick}>
+      {gameState.board[3 * row + col]}
+    </td>
+  )
+}
+
+function Board({ gameState }: {gameState: GameState}) {
+  return (
+    <table className='grid'>
+      <tbody>
+        <tr>
+          <Cell row={0} col={0} gameState={gameState} />
+          <Cell row={0} col={1} gameState={gameState} />
+          <Cell row={0} col={2} gameState={gameState} />
+        </tr>
+        <tr>
+          <Cell row={1} col={0} gameState={gameState} />
+          <Cell row={1} col={1} gameState={gameState} />
+          <Cell row={1} col={2} gameState={gameState} />
+        </tr>
+        <tr>
+          <Cell row={2} col={0} gameState={gameState} />
+          <Cell row={2} col={1} gameState={gameState} />
+          <Cell row={2} col={2} gameState={gameState} />
+        </tr>
+      </tbody>
+    </table>
+  )
+}
+
 export function Game({ gameState, setGameState }: GameType) {
   const board = gameState.board
   const winner = gameState.winner
