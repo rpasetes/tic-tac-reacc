@@ -1,4 +1,11 @@
-export function Game({ gameState, setGameState }) {
+import { makeMove, type GameState } from "./tictactoe"
+
+type GameType = {
+  gameState: GameState,
+  setGameState: React.Dispatch<React.SetStateAction<GameState>>
+}
+
+export function Game({ gameState, setGameState }: GameType) {
   const board = gameState.board
   const winner = gameState.winner
 

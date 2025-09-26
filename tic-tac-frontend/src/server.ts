@@ -28,9 +28,11 @@ const generateId = (): string => {
   return id_number.toString()
 }
 
+// (2129) shout out actually just destructuring
+// a map into an array of key val pairs
 app.get("/games", (_, res) => {
   console.log(gamestate_map)
-  res.json(Object.fromEntries(gamestate_map))
+  res.json([...gamestate_map])
 })
 
 // (1504) oh lmao every created board refs initGameState
