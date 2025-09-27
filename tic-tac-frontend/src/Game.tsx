@@ -8,7 +8,6 @@ type CellProps = {
 }
 
 function Cell({ cellIndex, gameState, makeMove }: CellProps) {
-
   const handleClick = () => {
     makeMove(cellIndex)
   }

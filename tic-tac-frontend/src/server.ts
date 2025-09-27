@@ -29,7 +29,7 @@ app.post("/create", (_, res) => {
   console.log(gamestate_map)
   console.log(gamestate_map.get(id))
 
-  res.json(gamestate_map.get(id))
+  res.json(gamestate_map.keys())
 })
 
 app.get("/message", (_, res) => res.send("Hello World!"))
