@@ -1,26 +1,21 @@
 import './App.css'
 import { useState } from 'react'
 import { Game } from './Game'
-import { GameList } from './GameList'
-import { initGameState, type GameState } from './tictactoe'
+import { Lobby } from './Lobby'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const queryClient = new QueryClient()
 
-// TODO: learn the difference between server state and client state
-// to understand how they connect.
 function App() {
-  const [gameState, setGameState] = useState<GameState>(initGameState)
+  // const [gameState, setGameState] = useState<GameState>(initGameState)
+  const [gameId, setGameId] = useState<string | undefined>(undefined)
 
   return (
-    <>
-      <h1>LOCAL TIC-TAC-REACC</h1>
-      <Game gameState={gameState} setGameState={setGameState} />
-      <h1>SERVER TIC-TAC-REACC</h1>
-      <QueryClientProvider client={queryClient}>
-        <GameList />
-      </QueryClientProvider>
-    </>
+    <QueryClientProvider client={queryClient}>
+      {/* <Game gameState={gameState} setGameState={setGameState} /> */}
+      {/* <Lobby /> */}
+      {gameId ? <Game gameId={gameId} /> : <Lobby setGameId={setGameId} />}
+    </QueryClientProvider>
   )
 }
 

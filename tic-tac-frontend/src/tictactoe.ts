@@ -1,51 +1,59 @@
 type Player = 'X' | 'O'
 
 export type GameState = {
+  id: string
   nowPlaying: Player,
   winner: string | null
   board: string[],
 }
 
-export const initGameState: GameState = {
-  nowPlaying: 'X' as Player,
-  winner: null,
-  board: ['', '', '', '', '', '', '', '', '']
-}
+// export const initGameState: GameState = {
+//   id: undefined,
+//   nowPlaying: 'X' as Player,
+//   winner: null,
+//   board: ['', '', '', '', '', '', '', '', '']
+// }
 
 export function createGameState() {
-  return structuredClone(initGameState)
+  return {
+    id: generateId(),
+    nowPlaying: 'X' as Player,
+    winner: null,
+    board: ['', '', '', '', '', '', '', '', '']
+  }
 }
 
-export const makeMove = (gamestate: GameState, row: number, col: number): GameState => {
+export const makeMove = (cellIndex: number, gamestate: GameState): GameState => {
   if (gamestate.winner) { return gamestate }
-  const boardCopy = gamestate.board
-  const cell = 3 * row + col
+  const newGame = structuredClone(gamestate)
+  const boardCopy = newGame.board
 
-  if (boardCopy[cell] != '') { return gamestate }
-  boardCopy[cell] = gamestate.nowPlaying
+  if (boardCopy[cellIndex] != '') { return newGame }
+  boardCopy[cellIndex] = newGame.nowPlaying
 
-  const newPlayer = gamestate.nowPlaying === 'X' ? 'O' : 'X'
-
-  const winner = checkWinner(boardCopy)
-  
-  const newGameState: GameState = {
-    nowPlaying: newPlayer,
-    winner: winner,
-    board: boardCopy
+  return {
+    ...newGame,
+    board: boardCopy,
+    nowPlaying: newGame.nowPlaying === 'X' ? 'O' : 'X',
+    winner: checkWinner(boardCopy)
   }
+}
 
-  return newGameState
+const generateId = (): string => {
+  const id_number = Math.floor(Math.random() * 2048)
+  console.log(id_number)
+  return id_number.toString()
 }
 
 export const checkWinner = (currentBoard: string[]): string | null => {
   const winStates = [
-    [0, 1, 2], 
-    [3, 4, 5], 
-    [6, 7, 8], 
-    [0, 3, 6], 
-    [1, 4, 7], 
-    [2, 5, 8], 
-    [0, 4, 8], 
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
     [2, 4, 6]
   ]
 
