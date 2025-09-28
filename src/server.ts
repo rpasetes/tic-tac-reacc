@@ -15,21 +15,21 @@ function createGame(): string {
   return gamestate.id
 }
 
-
-// HTTP SERVER
-
+// HTTP SERVER LOGIC
 app.get("/games", (_, res) => {
   console.log(gamestate_map)
-  res.json(gamestate_map.keys())
+  const idList = Array.from(gamestate_map.keys())
+  console.log(idList)
+  res.json(idList)
 })
 
 app.post("/create", (_, res) => {
   const id = createGame()
 
-  console.log(gamestate_map)
-  console.log(gamestate_map.get(id))
+  console.log('updating map to', gamestate_map)
+  console.log('with keys:', gamestate_map.keys())
 
-  res.json(gamestate_map.keys())
+  res.json([id])
 })
 
 app.get("/message", (_, res) => res.send("Hello World!"))

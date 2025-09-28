@@ -50,15 +50,12 @@ function Board({ gameState, makeMove }: BoardProps) {
 
 type GameProps = {
   gameId: string
+  setGameId: React.Dispatch<React.SetStateAction<string | undefined>>
 }
 
-// (1833) OMG... is that it?
-export function Game({ gameId }: GameProps) {
+export function Game({ gameId, setGameId }: GameProps) {
   const [gameState, setGameState] = useState<GameState | undefined>(undefined)
 
-  // 1. loadGame
-  // --> setGameState, useEffect
-  // `/game/${gameId}`
   useEffect(() => {
     async function fetchGame() {
       const response = await fetch(`/game/${gameId}`)
@@ -68,11 +65,6 @@ export function Game({ gameId }: GameProps) {
     fetchGame()
   }, [gameId])
 
-  // 2. makeMove
-  // --> setGameState
-  // function makeMove(){
-  //   setGameState
-  // }
   const makeMove = async (cellIndex: number) => {
     const response = await fetch(`/move/${gameId}`, {
       method: 'POST',
@@ -90,6 +82,9 @@ export function Game({ gameId }: GameProps) {
     <div>
       <Board makeMove={makeMove} gameState={gameState} />
       {gameState.winner && <h1>{gameState.winner} WINS!</h1>}
+      <button onClick={() => setGameId(undefined)}>
+        Return to Lobby
+      </button>
     </div>
   )
 }

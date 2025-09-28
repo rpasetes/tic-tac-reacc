@@ -7,13 +7,6 @@ export type GameState = {
   board: string[],
 }
 
-// export const initGameState: GameState = {
-//   id: undefined,
-//   nowPlaying: 'X' as Player,
-//   winner: null,
-//   board: ['', '', '', '', '', '', '', '', '']
-// }
-
 export function createGameState() {
   return {
     id: generateId(),
