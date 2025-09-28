@@ -15,7 +15,7 @@ function createGame(): string {
   return gamestate.id
 }
 
-// HTTP SERVER
+// HTTP SERVER LOGIC
 app.get("/games", (_, res) => {
   console.log(gamestate_map)
   const idList = Array.from(gamestate_map.keys())
