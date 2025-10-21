@@ -25,19 +25,55 @@ export function Lobby({ setGameId }: LobbyProps) {
     createNewGame()
   }
 
-  if (error) return <div>{error}</div>
-  if (loading) return <div>Loading...</div>
+  if (error) return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full">
+        <p className="text-red-600 font-medium text-center">{error}</p>
+      </div>
+    </div>
+  )
+
+  if (loading) return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="text-gray-600 font-medium">Loading...</div>
+    </div>
+  )
+
   return (
-    <div>
-      <h1>SERVER LOBBY</h1>
-      <button onClick={handleClick}>
-        Create New Game
-      </button>
-      {gameList && gameList.map((gameId) => (
-        <div key={gameId}>
-          <button onClick={() => setGameId(gameId)}>Join {gameId}</button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">Tic Tac Toe</h1>
+          <p className="text-gray-500 text-sm">Welcome to the lobby</p>
         </div>
-      ))}
+
+        <button
+          onClick={handleClick}
+          className="w-full py-3 px-4 mb-8 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
+        >
+          Create New Game
+        </button>
+
+        <div>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Active Games</p>
+          {gameList && gameList.length > 0 ? (
+            <div className="space-y-2">
+              {gameList.map((gameId) => (
+                <button
+                  key={gameId}
+                  onClick={() => setGameId(gameId)}
+                  className="w-full py-3 px-4 rounded-lg font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors duration-200 text-left flex items-center justify-between"
+                >
+                  <span>Game #{gameId}</span>
+                  <span className="text-xs text-gray-500">→</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-sm text-center py-4">No active games</p>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

@@ -12,8 +12,21 @@ function Cell({ cellIndex, gameState, makeMove }: CellProps) {
     makeMove(cellIndex)
   }
 
+  const cell = gameState.board[cellIndex]
+  const isX = cell === 'X'
+  const isO = cell === 'O'
+
   return (
-    <td onClick={handleClick}>
+    <td
+      onClick={handleClick}
+      className={`
+        cursor-pointer select-none transition-colors duration-200
+        ${!cell ? 'hover:bg-gray-50' : ''}
+        ${isX ? 'text-blue-600' : ''}
+        ${isO ? 'text-red-600' : ''}
+        ${!gameState.winner && !cell ? 'active:bg-gray-100' : ''}
+      `}
+    >
       {gameState.board[cellIndex]}
     </td>
   )
@@ -77,14 +90,53 @@ export function Game({ gameId, setGameId }: GameProps) {
     setGameState(game)
   }
 
-  if (!gameState) return <div>Loading...</div>
+  if (!gameState) return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="text-gray-600 font-medium">Loading...</div>
+    </div>
+  )
+
   return (
-    <div>
-      <Board makeMove={makeMove} gameState={gameState} />
-      {gameState.winner && <h1>{gameState.winner} WINS!</h1>}
-      <button onClick={() => setGameId(undefined)}>
-        Return to Lobby
-      </button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full">
+        <div className="text-center mb-8">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Game ID</h2>
+          <p className="text-2xl font-bold text-gray-800">{gameId}</p>
+        </div>
+
+        <div className="flex justify-center mb-8">
+          <Board makeMove={makeMove} gameState={gameState} />
+        </div>
+
+        <div className="text-center mb-8">
+          {gameState.winner ? (
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Game Over</p>
+              <h1 className={`text-4xl font-bold ${
+                gameState.winner === 'X' ? 'text-blue-600' : 'text-red-600'
+              }`}>
+                {gameState.winner} Wins!
+              </h1>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Current Player</p>
+              <p className={`text-3xl font-bold ${
+                gameState.nowPlaying === 'X' ? 'text-blue-600' : 'text-red-600'
+              }`}>
+                {gameState.nowPlaying}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={() => setGameId(undefined)}
+          className="w-full py-3 px-4 rounded-lg font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
+        >
+          Return to Lobby
+        </button>
+      </div>
     </div>
   )
 }
